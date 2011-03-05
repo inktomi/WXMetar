@@ -16,4 +16,20 @@ public class Metar {
     public int dewPoint;
     public float altimeter;
 
+    @Override
+    public String toString() {
+        return "Metar{" +
+                "station='" + station + '\'' +
+                ", auto=" + auto +
+                ", dayOfMonth=" + dayOfMonth +
+                ", zuluTime=" + zuluTime +
+                ", winds=" + winds +
+                ", visibility=" + visibility +
+                ", presentWeather=" + presentWeather +
+                ", clouds=" + clouds +
+                ", temperature=" + temperature +
+                ", dewPoint=" + dewPoint +
+                ", altimeter=" + altimeter +
+                '}';
+    }
 }

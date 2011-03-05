@@ -97,20 +97,6 @@
 
 
     <!-- Application Server Libraries -->
-    <!-- Register Custom Compiler Taskdefs -->
-    <property name="javac2.home" value="${idea.home}/lib"/>
-    <path id="javac2.classpath">
-        <pathelement location="${javac2.home}/javac2.jar"/>
-        <pathelement location="${javac2.home}/jdom.jar"/>
-        <pathelement location="${javac2.home}/asm.jar"/>
-        <pathelement location="${javac2.home}/asm-commons.jar"/>
-        <pathelement location="${javac2.home}/jgoodies-forms.jar"/>
-    </path>
-    <target name="register.custom.compilers">
-        <taskdef name="javac2" classname="com.intellij.ant.Javac2" classpathref="javac2.classpath"/>
-        <taskdef name="instrumentIdeaExtensions" classname="com.intellij.ant.InstrumentIdeaExtensions"
-                 classpathref="javac2.classpath"/>
-    </target>
 
     <!-- Modules -->
 
@@ -180,17 +166,18 @@
     <target name="compile.module.wxmetar" depends="compile.module.wxmetar.production,compile.module.wxmetar.tests"
             description="Compile module WXMetar"/>
 
-    <target name="compile.module.wxmetar.production" depends="register.custom.compilers"
-            description="Compile module WXMetar; production classes">
+    <target name="compile.module.wxmetar.production" description="Compile module WXMetar; production classes">
         <mkdir dir="${wxmetar.output.dir}"/>
-        <javac2 destdir="${wxmetar.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}"
-                memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.wxmetar}/javac">
+        <javac destdir="${wxmetar.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}"
+               memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.wxmetar}/javac">
             <compilerarg line="${compiler.args.wxmetar}"/>
             <bootclasspath refid="wxmetar.module.bootclasspath"/>
             <classpath refid="wxmetar.module.production.classpath"/>
             <src refid="wxmetar.module.sourcepath"/>
             <patternset refid="excluded.from.compilation.wxmetar"/>
-        </javac2>
+        </javac>
+
+        <jar destfile="${wxmetar.output.dir}/wxmetar.jar" basedir="${wxmetar.output.dir}"/>
 
         <copy todir="${wxmetar.output.dir}">
             <fileset dir="${module.wxmetar.basedir}/src">
@@ -200,17 +187,17 @@
         </copy>
     </target>
 
-    <target name="compile.module.wxmetar.tests" depends="register.custom.compilers,compile.module.wxmetar.production"
+    <target name="compile.module.wxmetar.tests" depends="compile.module.wxmetar.production"
             description="compile module WXMetar; test classes" unless="skip.tests">
         <mkdir dir="${wxmetar.testoutput.dir}"/>
-        <javac2 destdir="${wxmetar.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}"
-                memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.wxmetar}/javac">
+        <javac destdir="${wxmetar.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}"
+               memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.wxmetar}/javac">
             <compilerarg line="${compiler.args.wxmetar}"/>
             <bootclasspath refid="wxmetar.module.bootclasspath"/>
             <classpath refid="wxmetar.module.classpath"/>
             <src refid="wxmetar.module.test.sourcepath"/>
             <patternset refid="excluded.from.compilation.wxmetar"/>
-        </javac2>
+        </javac>
 
         <copy todir="${wxmetar.testoutput.dir}">
             <fileset dir="${module.wxmetar.basedir}/test">
