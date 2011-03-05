@@ -1,5 +1,6 @@
 package com.inktomi.wxmetar;
 
+import com.inktomi.wxmetar.metar.Cloud;
 import com.inktomi.wxmetar.metar.Metar;
 import com.inktomi.wxmetar.metar.PresentWeather;
 import org.junit.Before;
@@ -29,7 +30,7 @@ public class TMetarParser {
 
     @Test
     public void testParseMetar() {
-        test = MetarParser.parseMetar("KLAS 050156Z VRB03KT 10SM SCT250 17/M09 A3022 RMK AO2 SLP226 T01721089");
+        test = MetarParser.parseMetar("KLAS 050156Z VRB03KT 10SM SCT250 13/M06 A3022 RMK AO2 SLP226 T01721089");
 
         assertEquals("KLAS", test.station);
         assertFalse(test.auto);
@@ -39,15 +40,24 @@ public class TMetarParser {
 
         // Winds
         assertTrue(test.winds.variable);
-        assertEquals((long) 3, (long) test.winds.windSpeed);
+        assertEquals(3, (long) test.winds.windSpeed);
 
         // Visibility
-        assertEquals((long) 10, (long) test.visibility);
+        assertEquals(10, (long) test.visibility);
+
+        // Clouds
+        assertEquals(1, test.clouds.size());
+        assertEquals(Cloud.Type.SCT, test.clouds.get(0).cloudType);
+        assertEquals(250, test.clouds.get(0).altitude);
+
+        // Temp and dew point
+        assertEquals(13, test.temperature);
+        assertEquals(-6, test.dewPoint);
     }
 
     @Test
     public void testParseMetarFractionalVisibility() {
-        test = MetarParser.parseMetar("KLAS 050156Z VRB03KT 1 1/2SM SCT070 SCT085 OVC110 17/M09 A3022 RMK AO2 SLP226 T01721089");
+        test = MetarParser.parseMetar("KLAS 050156Z VRB03KT 1 1/2SM -SHRA SCT070 SCT085 OVC110 17/M09 A3022 RMK AO2 SLP226 T01721089");
 
         assertEquals("KLAS", test.station);
         assertFalse(test.auto);
@@ -57,10 +67,28 @@ public class TMetarParser {
 
         // Winds
         assertTrue(test.winds.variable);
-        assertEquals((long) 3, (long) test.winds.windSpeed);
+        assertEquals(3, (long) test.winds.windSpeed);
 
         // Visibility
         assertEquals(1.5, test.visibility, 1e-8);
+
+        // Present Weather
+        assertEquals(PresentWeather.RA, test.presentWeather);
+        assertEquals(PresentWeather.Intensity.LIGHT, test.presentWeather.getIntensity());
+        assertEquals(PresentWeather.Qualifier.SH, test.presentWeather.getQualifier());
+
+        // Clouds
+        assertEquals(3, test.clouds.size());
+        assertEquals(Cloud.Type.SCT, test.clouds.get(0).cloudType);
+        assertEquals(70, test.clouds.get(0).altitude);
+        assertEquals(Cloud.Type.SCT, test.clouds.get(1).cloudType);
+        assertEquals(85, test.clouds.get(1).altitude);
+        assertEquals(Cloud.Type.OVC, test.clouds.get(2).cloudType);
+        assertEquals(110, test.clouds.get(2).altitude);
+
+        // Temp and dew point
+        assertEquals(17, test.temperature);
+        assertEquals(-9, test.dewPoint);
     }
 
     @Test
@@ -176,5 +204,44 @@ public class TMetarParser {
         assertEquals(PresentWeather.SN, test.presentWeather);
         assertEquals(PresentWeather.Intensity.HEAVY, test.presentWeather.getIntensity());
         assertEquals(PresentWeather.Qualifier.BL, test.presentWeather.getQualifier());
+    }
+
+    @Test
+    public void testCloudsClear() {
+        MetarParser.parseClouds("CLR", test);
+
+        assertEquals(Cloud.Type.CLR, test.clouds.get(0).cloudType);
+    }
+
+    @Test
+    public void testCloudsSKT() {
+        MetarParser.parseClouds("SCT085", test);
+
+        assertEquals(Cloud.Type.SCT, test.clouds.get(0).cloudType);
+        assertEquals(85, test.clouds.get(0).altitude);
+    }
+
+    @Test
+    public void testTemperatureAndDewpoint() {
+        MetarParser.parseTempDewpoint("14/01", test);
+
+        assertEquals(14, test.temperature);
+        assertEquals(1, test.dewPoint);
+    }
+
+    @Test
+    public void testNegTemperatureAndNegDewpoint() {
+        MetarParser.parseTempDewpoint("M01/M10", test);
+
+        assertEquals(-1, test.temperature);
+        assertEquals(-10, test.dewPoint);
+    }
+
+    @Test
+    public void testTemperatureAndNegDewpoint() {
+        MetarParser.parseTempDewpoint("01/M10", test);
+
+        assertEquals(1, test.temperature);
+        assertEquals(-10, test.dewPoint);
     }
 }

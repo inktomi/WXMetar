@@ -8,10 +8,10 @@ package com.inktomi.wxmetar.metar;
  * To change this template use File | Settings | File Templates.
  */
 public class Cloud {
-    public Encoding code;
+    public Type cloudType;
     public int altitude;
 
-    public enum Encoding {
+    public enum Type {
         SKC("Clear"),
         CLR("Clear"),
         FEW("Few"),
@@ -19,15 +19,14 @@ public class Cloud {
         BKN("Broken"),
         OVC("Overcast");
 
+        private String name;
 
-        Encoding(String type) {
-            this.type = type;
+        Type(String type) {
+            this.name = type;
         }
 
-        private String type;
-
-        public String getType() {
-            return type;
+        public String getName() {
+            return name;
         }
     }
 }

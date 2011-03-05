@@ -1,5 +1,6 @@
 package com.inktomi.wxmetar;
 
+import com.inktomi.wxmetar.metar.Cloud;
 import com.inktomi.wxmetar.metar.Metar;
 import com.inktomi.wxmetar.metar.PresentWeather;
 import org.apache.commons.lang.StringUtils;
@@ -84,6 +85,14 @@ public class MetarParser {
             }
 
             if (parsePresentWeather(token, rval)) {
+                continue;
+            }
+
+            if (parseClouds(token, rval)) {
+                continue;
+            }
+
+            if (parseTempDewpoint(token, rval)) {
                 continue;
             }
 
@@ -199,7 +208,12 @@ public class MetarParser {
         }
 
         // Strip off any possible modifier, and try to find a match
-        PresentWeather presentWeather = PresentWeather.valueOf(weather);
+        PresentWeather presentWeather = null;
+        try {
+            presentWeather = PresentWeather.valueOf(weather);
+        } catch (IllegalArgumentException e) {
+            return rval;
+        }
 
         if (null != presentWeather) {
             // Check for a modifier
@@ -227,8 +241,58 @@ public class MetarParser {
 
     // CLR
     // SCT070 SCT085 OVC110
-    static boolean parseCloud(String token, final Metar metar) {
+    static boolean parseClouds(String token, final Metar metar) {
         boolean rval = Boolean.FALSE;
+
+        // Try to see if the first three characters match a Cloud.Type
+        Cloud.Type cloudType = null;
+        try {
+            cloudType = Cloud.Type.valueOf(StringUtils.substring(token, 0, 3));
+        } catch (IllegalArgumentException e) {
+            return rval;
+        }
+
+        if (null != cloudType) {
+            rval = Boolean.TRUE;
+
+            Cloud c = new Cloud();
+            c.cloudType = cloudType;
+
+            if (!cloudType.equals(Cloud.Type.CLR)) {
+                c.altitude = Integer.parseInt(StringUtils.substring(token, 3, token.length()));
+            }
+
+            metar.clouds.add(c);
+        }
+
+        return rval;
+    }
+
+    // 14/11  14/M01
+    static boolean parseTempDewpoint(String token, final Metar metar) {
+        boolean rval = Boolean.FALSE;
+
+        // Is it in the right pattern?
+        Pattern dewPoint = Pattern.compile("^(M)?(\\d{2})/(M)?(\\d{2})$");
+        Matcher dewPointMatcher = dewPoint.matcher(token);
+
+        if (dewPointMatcher.matches()) {
+            rval = Boolean.TRUE;
+
+            metar.temperature = Integer.parseInt(dewPointMatcher.group(2));
+
+            // Is the temperature negative?
+            if (null != dewPointMatcher.group(1)) {
+                metar.temperature = 0 - metar.temperature;
+            }
+
+            metar.dewPoint = Integer.parseInt(dewPointMatcher.group(4));
+
+            // Is the dewpoint negative?
+            if (null != dewPointMatcher.group(3)) {
+                metar.dewPoint = 0 - metar.dewPoint;
+            }
+        }
 
         return rval;
     }
