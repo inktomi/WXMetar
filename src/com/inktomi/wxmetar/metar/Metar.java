@@ -1,22 +1,16 @@
 package com.inktomi.wxmetar.metar;
 
-import android.view.Window;
-
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by IntelliJ IDEA.
- * User: matthew
- * Date: 3/4/11
- * Time: 10:18 PM
- * To change this template use File | Settings | File Templates.
- */
 public class Metar {
+    public String station;
+    public boolean auto;
     public int dayOfMonth;
     public int zuluTime;
-    public Wind winds;
+    public Wind winds = new Wind();
     public float visibility;
-    public List<Cloud> clouds;
+    public List<Cloud> clouds = new ArrayList<Cloud>();
     public int temperature;
     public int dewPoint;
     public float altimeter;

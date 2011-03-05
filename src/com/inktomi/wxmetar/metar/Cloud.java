@@ -1,9 +1,5 @@
 package com.inktomi.wxmetar.metar;
 
-import sun.util.resources.CalendarData_lt;
-
-import javax.management.loading.ClassLoaderRepository;
-
 /**
  * Created by IntelliJ IDEA.
  * User: matthew

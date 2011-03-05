@@ -9,6 +9,7 @@ package com.inktomi.wxmetar.metar;
  */
 public class Wind {
     public boolean variable;
-    public float windSpeed;
-    public float windDirection;
+    public float windSpeed = -1;
+    public float windGusts = -1;
+    public float windDirection = -1;
 }
