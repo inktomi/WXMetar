@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="wxmetar" default="all">
+
+
+    <property file="wxmetar.properties"/>
+    <!-- Uncomment the following property if no tests compilation is needed -->
+    <!--
+   <property name="skip.tests" value="true"/>
+    -->
+
+    <!-- Compiler options -->
+
+    <property name="compiler.debug" value="on"/>
+    <property name="compiler.generate.no.warnings" value="off"/>
+    <property name="compiler.args" value=""/>
+    <property name="compiler.max.memory" value="128m"/>
+    <patternset id="ignored.files">
+        <exclude name="**/CVS/**"/>
+        <exclude name="**/SCCS/**"/>
+        <exclude name="**/RCS/**"/>
+        <exclude name="**/rcs/**"/>
+        <exclude name="**/.DS_Store/**"/>
+        <exclude name="**/.svn/**"/>
+        <exclude name="**/.pyc/**"/>
+        <exclude name="**/.pyo/**"/>
+        <exclude name="**/*.pyc/**"/>
+        <exclude name="**/*.pyo/**"/>
+        <exclude name="**/.git/**"/>
+        <exclude name="**/*.hprof/**"/>
+        <exclude name="**/_svn/**"/>
+        <exclude name="**/.hg/**"/>
+        <exclude name="**/*.lib/**"/>
+        <exclude name="**/*~/**"/>
+    </patternset>
+    <patternset id="library.patterns">
+        <include name="*.war"/>
+        <include name="*.ear"/>
+        <include name="*.zip"/>
+        <include name="*.swc"/>
+        <include name="*.egg"/>
+        <include name="*.jar"/>
+    </patternset>
+    <patternset id="compiler.resources">
+        <include name="**/?*.properties"/>
+        <include name="**/?*.xml"/>
+        <include name="**/?*.gif"/>
+        <include name="**/?*.png"/>
+        <include name="**/?*.jpeg"/>
+        <include name="**/?*.jpg"/>
+        <include name="**/?*.html"/>
+        <include name="**/?*.dtd"/>
+        <include name="**/?*.tld"/>
+        <include name="**/?*.ftl"/>
+    </patternset>
+
+    <!-- JDK definitions -->
+
+    <property name="jdk.bin.1.6" value="${jdk.home.1.6}/bin"/>
+    <path id="jdk.classpath.1.6">
+        <fileset dir="${jdk.home.1.6}">
+            <include name="../../../../Support/Deploy.bundle/Contents/Resources/Java/deploy.jar"/>
+            <include name="lib/dt.jar"/>
+            <include name="lib/javaws.jar"/>
+            <include name="lib/jce.jar"/>
+            <include name="lib/jconsole.jar"/>
+            <include name="lib/management-agent.jar"/>
+            <include name="lib/plugin.jar"/>
+            <include name="lib/sa-jdi.jar"/>
+            <include name="../Classes/alt-rt.jar"/>
+            <include name="../Classes/charsets.jar"/>
+            <include name="../Classes/classes.jar"/>
+            <include name="../Classes/jsse.jar"/>
+            <include name="../Classes/ui.jar"/>
+            <include name="lib/ext/apple_provider.jar"/>
+            <include name="lib/ext/dnsns.jar"/>
+            <include name="lib/ext/localedata.jar"/>
+            <include name="lib/ext/sunjce_provider.jar"/>
+            <include name="lib/ext/sunpkcs11.jar"/>
+        </fileset>
+    </path>
+
+    <property name="project.jdk.home" value="${jdk.home.1.6}"/>
+    <property name="project.jdk.bin" value="${jdk.bin.1.6}"/>
+    <property name="project.jdk.classpath" value="jdk.classpath.1.6"/>
+
+
+    <!-- Project Libraries -->
+
+    <path id="library.libraries.classpath">
+        <fileset dir="${basedir}/libs">
+            <patternset refid="library.patterns"/>
+        </fileset>
+    </path>
+
+
+    <!-- Global Libraries -->
+
+
+    <!-- Application Server Libraries -->
+    <!-- Register Custom Compiler Taskdefs -->
+    <property name="javac2.home" value="${idea.home}/lib"/>
+    <path id="javac2.classpath">
+        <pathelement location="${javac2.home}/javac2.jar"/>
+        <pathelement location="${javac2.home}/jdom.jar"/>
+        <pathelement location="${javac2.home}/asm.jar"/>
+        <pathelement location="${javac2.home}/asm-commons.jar"/>
+        <pathelement location="${javac2.home}/jgoodies-forms.jar"/>
+    </path>
+    <target name="register.custom.compilers">
+        <taskdef name="javac2" classname="com.intellij.ant.Javac2" classpathref="javac2.classpath"/>
+        <taskdef name="instrumentIdeaExtensions" classname="com.intellij.ant.InstrumentIdeaExtensions"
+                 classpathref="javac2.classpath"/>
+    </target>
+
+    <!-- Modules -->
+
+
+    <!-- Module WXMetar -->
+
+    <dirname property="module.wxmetar.basedir" file="${ant.file}"/>
+
+
+    <property name="module.jdk.home.wxmetar" value="${project.jdk.home}"/>
+    <property name="module.jdk.bin.wxmetar" value="${project.jdk.bin}"/>
+    <property name="module.jdk.classpath.wxmetar" value="${project.jdk.classpath}"/>
+
+    <property name="compiler.args.wxmetar" value="${compiler.args}"/>
+
+    <property name="wxmetar.output.dir" value="${module.wxmetar.basedir}/out/production/WXMetar"/>
+    <property name="wxmetar.testoutput.dir" value="${module.wxmetar.basedir}/out/test/WXMetar"/>
+
+    <path id="wxmetar.module.bootclasspath">
+        <!-- Paths to be included in compilation bootclasspath -->
+    </path>
+
+    <path id="wxmetar.module.production.classpath">
+        <path refid="${module.jdk.classpath.wxmetar}"/>
+        <path refid="library.libraries.classpath"/>
+    </path>
+
+    <path id="wxmetar.runtime.production.module.classpath">
+        <pathelement location="${wxmetar.output.dir}"/>
+        <path refid="library.libraries.classpath"/>
+    </path>
+
+    <path id="wxmetar.module.classpath">
+        <path refid="${module.jdk.classpath.wxmetar}"/>
+        <pathelement location="${wxmetar.output.dir}"/>
+        <path refid="library.libraries.classpath"/>
+    </path>
+
+    <path id="wxmetar.runtime.module.classpath">
+        <pathelement location="${wxmetar.testoutput.dir}"/>
+        <pathelement location="${wxmetar.output.dir}"/>
+        <path refid="library.libraries.classpath"/>
+    </path>
+
+
+    <patternset id="excluded.from.module.wxmetar">
+        <patternset refid="ignored.files"/>
+    </patternset>
+
+    <patternset id="excluded.from.compilation.wxmetar">
+        <patternset refid="excluded.from.module.wxmetar"/>
+    </patternset>
+
+    <path id="wxmetar.module.sourcepath">
+        <dirset dir="${module.wxmetar.basedir}">
+            <include name="src"/>
+        </dirset>
+    </path>
+
+    <path id="wxmetar.module.test.sourcepath">
+        <dirset dir="${module.wxmetar.basedir}">
+            <include name="test"/>
+        </dirset>
+    </path>
+
+
+    <target name="compile.module.wxmetar" depends="compile.module.wxmetar.production,compile.module.wxmetar.tests"
+            description="Compile module WXMetar"/>
+
+    <target name="compile.module.wxmetar.production" depends="register.custom.compilers"
+            description="Compile module WXMetar; production classes">
+        <mkdir dir="${wxmetar.output.dir}"/>
+        <javac2 destdir="${wxmetar.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}"
+                memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.wxmetar}/javac">
+            <compilerarg line="${compiler.args.wxmetar}"/>
+            <bootclasspath refid="wxmetar.module.bootclasspath"/>
+            <classpath refid="wxmetar.module.production.classpath"/>
+            <src refid="wxmetar.module.sourcepath"/>
+            <patternset refid="excluded.from.compilation.wxmetar"/>
+        </javac2>
+
+        <copy todir="${wxmetar.output.dir}">
+            <fileset dir="${module.wxmetar.basedir}/src">
+                <patternset refid="compiler.resources"/>
+                <type type="file"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="compile.module.wxmetar.tests" depends="register.custom.compilers,compile.module.wxmetar.production"
+            description="compile module WXMetar; test classes" unless="skip.tests">
+        <mkdir dir="${wxmetar.testoutput.dir}"/>
+        <javac2 destdir="${wxmetar.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}"
+                memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.wxmetar}/javac">
+            <compilerarg line="${compiler.args.wxmetar}"/>
+            <bootclasspath refid="wxmetar.module.bootclasspath"/>
+            <classpath refid="wxmetar.module.classpath"/>
+            <src refid="wxmetar.module.test.sourcepath"/>
+            <patternset refid="excluded.from.compilation.wxmetar"/>
+        </javac2>
+
+        <copy todir="${wxmetar.testoutput.dir}">
+            <fileset dir="${module.wxmetar.basedir}/test">
+                <patternset refid="compiler.resources"/>
+                <type type="file"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="clean.module.wxmetar" description="cleanup module">
+        <delete dir="${wxmetar.output.dir}"/>
+        <delete dir="${wxmetar.testoutput.dir}"/>
+    </target>
+
+    <target name="init" description="Build initialization">
+        <!-- Perform any build initialization in this target -->
+    </target>
+
+    <target name="clean" depends="clean.module.wxmetar, clean.artifact.wxmetar:ear_exploded" description="cleanup all"/>
+
+    <target name="build.modules" depends="init, clean, compile.module.wxmetar" description="build all modules"/>
+
+    <target name="init.artifacts">
+        <property name="artifacts.temp.dir" value="${basedir}/__artifacts_temp"/>
+        <property name="artifact.output.wxmetar:ear_exploded" value="${basedir}/out/artifacts/WXMetar_ear_exploded"/>
+        <mkdir dir="${artifacts.temp.dir}"/>
+    </target>
+
+    <target name="clean.artifact.wxmetar:ear_exploded" description="clean WXMetar:ear exploded artifact output">
+        <delete dir="${artifact.output.wxmetar:ear_exploded}"/>
+    </target>
+
+    <target name="artifact.wxmetar:ear_exploded" depends="init.artifacts"
+            description="Build &apos;WXMetar:ear exploded&apos; artifact">
+        <mkdir dir="${artifact.output.wxmetar:ear_exploded}"/>
+    </target>
+
+    <target name="build.all.artifacts" depends="artifact.wxmetar:ear_exploded" description="Build all artifacts">
+
+        <!-- Delete temporary files -->
+        <delete dir="${artifacts.temp.dir}"/>
+    </target>
+
+    <target name="all" depends="build.modules, build.all.artifacts" description="build all"/>
+</project>

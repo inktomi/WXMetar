@@ -1,12 +1,15 @@
 package com.inktomi.wxmetar;
 
 import com.inktomi.wxmetar.metar.Metar;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 
 public class TMetarParser {
+    Metar test;
+
     public void testParse() {
         // KLAS 050156Z VRB03KT 10SM SCT250 17/M09 A3022 RMK AO2 SLP226 T01721089
         // KLAS 050556Z 24007KT 10SM FEW250 13/M06 A3025 RMK AO2 SLP236 T01331056 10194 20122 50005
@@ -18,39 +21,117 @@ public class TMetarParser {
         // KL35 051752Z AUTO 26006KT 10SM CLR 11/M19 A3030 RMK AO2
     }
 
-    // 26006KT, 17012G24KT, VRB03KT
+    @Before
+    public void setup() {
+        test = new Metar();
+    }
+
+    @Test
+    public void testParseMetar() {
+        test = MetarParser.parseMetar("KLAS 050156Z VRB03KT 10SM SCT250 17/M09 A3022 RMK AO2 SLP226 T01721089");
+
+        assertEquals("KLAS", test.station);
+        assertFalse(test.auto);
+
+        assertEquals(5, test.dayOfMonth);
+        assertEquals(156, test.zuluTime);
+
+        // Winds
+        assertTrue(test.winds.variable);
+        assertEquals((long) 3, (long) test.winds.windSpeed);
+
+        // Visibility
+        assertEquals((long) 10, (long) test.visibility);
+    }
+
+    @Test
+    public void testParseMetarFractionalVisibility() {
+        test = MetarParser.parseMetar("KLAS 050156Z VRB03KT 1 1/2SM SCT070 SCT085 OVC110 17/M09 A3022 RMK AO2 SLP226 T01721089");
+
+        assertEquals("KLAS", test.station);
+        assertFalse(test.auto);
+
+        assertEquals(5, test.dayOfMonth);
+        assertEquals(156, test.zuluTime);
+
+        // Winds
+        assertTrue(test.winds.variable);
+        assertEquals((long) 3, (long) test.winds.windSpeed);
+
+        // Visibility
+        assertEquals(1.5, test.visibility, 1e-8);
+    }
+
+    @Test
+    public void testAuto() {
+        MetarParser.parseModifier("AUTO", test);
+
+        assertTrue(test.auto);
+    }
+
+    @Test
+    public void testCorrectedAuto() {
+        MetarParser.parseModifier("COR", test);
+
+        assertTrue(test.auto);
+    }
+
+    @Test
+    public void testCloudsinWindParser() {
+        assertFalse(MetarParser.parseWinds("SCT250", test));
+        assertFalse(MetarParser.parseWinds("OVC110", test));
+        assertFalse(MetarParser.parseWinds("A3005", test));
+        assertFalse(MetarParser.parseWinds("SLP212", test));
+        assertFalse(MetarParser.parseWinds("11/M19", test));
+    }
 
     @Test
     public void testWindGusting() {
-        Metar test = new Metar();
-
         MetarParser.parseWinds("17012G24KT", test);
 
-        assertEquals((long) test.winds.windGusts, 24l);
-        assertEquals((long) test.winds.windDirection, 170l);
+        assertEquals(24l, (long) test.winds.windGusts);
+        assertEquals(170l, (long) test.winds.windDirection);
         assertFalse(test.winds.variable);
     }
 
     @Test
     public void testWindVariable() {
-        Metar test = new Metar();
-
         MetarParser.parseWinds("VRB03KT", test);
 
-        assertEquals((long) test.winds.windGusts, -1l);
-        assertEquals((long) test.winds.windDirection, -1l);
+        assertEquals(-1l, (long) test.winds.windGusts);
+        assertEquals(-1l, (long) test.winds.windDirection);
         assertTrue(test.winds.variable);
     }
 
     @Test
     public void testWindNormal() {
-        Metar test = new Metar();
-
         MetarParser.parseWinds("26006KT", test);
 
-        assertEquals((long) test.winds.windGusts, -1l);
-        assertEquals((long) test.winds.windDirection, 260l);
-        assertEquals((long) test.winds.windSpeed, 6l);
+        assertEquals(-1l, (long) test.winds.windGusts);
+        assertEquals(260l, (long) test.winds.windDirection);
+        assertEquals(6l, (long) test.winds.windSpeed);
         assertFalse(test.winds.variable);
+    }
+
+    @Test
+    public void testFractionalVisibility() {
+        MetarParser.parseVisibility("1", "1/2SM", test);
+
+        assertEquals(1.5f, test.visibility, 1e-8f);
+    }
+
+    @Test
+    public void testFullVisibility() {
+        MetarParser.parseVisibility("10SM", "SCT250", test);
+
+        assertEquals(10l, (long) test.visibility);
+    }
+
+    @Test
+    public void testInvalidVisibility() {
+        assertFalse(MetarParser.parseVisibility("10194", "20122", test));
+        assertFalse(MetarParser.parseVisibility("T00940028", "10094", test));
+        assertFalse(MetarParser.parseVisibility("RAE10B45", "SLP179", test));
+        assertFalse(MetarParser.parseVisibility("VRB03KT", "10SM", test));
     }
 }

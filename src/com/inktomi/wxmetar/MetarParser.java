@@ -3,7 +3,13 @@ package com.inktomi.wxmetar;
 import com.inktomi.wxmetar.metar.Metar;
 import org.apache.commons.lang.StringUtils;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class MetarParser {
+    private static Pattern NUMBER = Pattern.compile("^(\\d+)$");
+    private static Pattern FRACTION = Pattern.compile("^(?:(\\d+) */ *(\\d+))SM$");
+
     public static Metar parseMetar(final String input) {
         Metar finalMetar = new Metar();
 
@@ -37,13 +43,42 @@ public class MetarParser {
 
         rval.station = tokens[0];
 
+        // The day of the month is the first 2
+        rval.dayOfMonth = Integer.parseInt(StringUtils.substring(tokens[1], 0, 2));
+
         // The time is from 0 to length-1
-        rval.zuluTime = Integer.parseInt(StringUtils.substring(tokens[1], 0, tokens[1].length() - 1));
+        rval.zuluTime = Integer.parseInt(StringUtils.substring(tokens[1], 2, tokens[1].length() - 1));
 
         // We start our actual parsing at the third element
         for (int i = 2; i < tokens.length; i++) {
+            String token = tokens[i];
+            String nextToken = null;
+            if (tokens.length > i + 1) {
+                nextToken = tokens[i + 1];
+            }
+
             // First, we have AUTO or COR
-            if (parseModifier(tokens[i], rval)) {
+            if (parseModifier(token, rval)) {
+                continue;
+            }
+
+            if (parseWinds(token, rval)) {
+                continue;
+            }
+
+            if (null != nextToken && parseVisibility(token, nextToken, rval)) {
+                Matcher numberMatcher = NUMBER.matcher(token);
+                Matcher fractionMatcher = FRACTION.matcher(nextToken);
+
+                if (!StringUtils.endsWith(token, "SM")
+                        && numberMatcher.matches()
+                        && StringUtils.endsWith(nextToken, "SM")
+                        && fractionMatcher.matches()) {
+
+                    // Increment i one here since we had a fraction: 1 1/2SM
+                    i = i + 1;
+                }
+
                 continue;
             }
 
@@ -69,7 +104,6 @@ public class MetarParser {
         return rval;
     }
 
-    // todo: Winds over 100 knots
     // 26006KT, 17012G24KT, VRB03KT
     static boolean parseWinds(String token, final Metar metar) {
         boolean rval = Boolean.FALSE;
@@ -110,6 +144,39 @@ public class MetarParser {
             if (postionOfG == -1 && !metar.winds.variable) {
                 metar.winds.windSpeed = Float.parseFloat(StringUtils.substring(token, 2, token.length()));
             }
+        }
+
+        return rval;
+    }
+
+    // 1 1/2SM (damnit)
+    // 10SM
+    static boolean parseVisibility(String token, String nextToken, final Metar metar) {
+        boolean rval = Boolean.FALSE;
+
+        Matcher numberMatcher = NUMBER.matcher(token);
+        Matcher fractionMatcher = FRACTION.matcher(nextToken);
+
+        // Check for that fraction
+        if (!StringUtils.endsWith(token, "SM")
+                && numberMatcher.matches()
+                && StringUtils.endsWith(nextToken, "SM")
+                && fractionMatcher.matches()) {
+
+            // add them together
+            float visMiles = Float.parseFloat(token); // this should be something like 1 or 2
+
+            // Assemble the fraction
+            float visFraction = Float.parseFloat(fractionMatcher.group(1)) / Float.parseFloat(fractionMatcher.group(2));
+
+            metar.visibility = visMiles + visFraction;
+
+            rval = Boolean.TRUE;
+        }
+
+        // Get the SM out of the way
+        if (StringUtils.endsWith(token, "SM")) {
+            metar.visibility = Float.parseFloat(StringUtils.substring(token, 0, token.length() - 2));
         }
 
         return rval;
