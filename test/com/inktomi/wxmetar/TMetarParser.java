@@ -53,6 +53,9 @@ public class TMetarParser {
         // Temp and dew point
         assertEquals(13, test.temperature);
         assertEquals(-6, test.dewPoint);
+
+        // Altimeter
+        assertEquals(30.22f, test.altimeter, 1e-8f);
     }
 
     @Test
@@ -89,6 +92,9 @@ public class TMetarParser {
         // Temp and dew point
         assertEquals(17, test.temperature);
         assertEquals(-9, test.dewPoint);
+
+        // Altimeter
+        assertEquals(30.22f, test.altimeter, 1e-8f);
     }
 
     @Test
@@ -243,5 +249,12 @@ public class TMetarParser {
 
         assertEquals(1, test.temperature);
         assertEquals(-10, test.dewPoint);
+    }
+
+    @Test
+    public void testAltimeter() {
+        MetarParser.parseAltimeter("A2992", test);
+
+        assertEquals(29.92f, test.altimeter, 1e-8f);
     }
 }

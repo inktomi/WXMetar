@@ -96,6 +96,10 @@ public class MetarParser {
                 continue;
             }
 
+            if (parseAltimeter(token, rval)) {
+                continue;
+            }
+
         }
 
         return rval;
@@ -292,6 +296,21 @@ public class MetarParser {
             if (null != dewPointMatcher.group(3)) {
                 metar.dewPoint = 0 - metar.dewPoint;
             }
+        }
+
+        return rval;
+    }
+
+    static boolean parseAltimeter(String token, final Metar metar) {
+        boolean rval = Boolean.FALSE;
+
+        if (StringUtils.startsWith(token, "A")
+                && token.length() == 5) {
+            rval = Boolean.TRUE;
+
+            Integer alt = Integer.parseInt(StringUtils.substring(token, 1, token.length()));
+
+            metar.altimeter = (float) alt / 100;
         }
 
         return rval;
