@@ -1,6 +1,7 @@
 package com.inktomi.wxmetar;
 
 import com.inktomi.wxmetar.metar.Metar;
+import com.inktomi.wxmetar.metar.PresentWeather;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -133,5 +134,47 @@ public class TMetarParser {
         assertFalse(MetarParser.parseVisibility("T00940028", "10094", test));
         assertFalse(MetarParser.parseVisibility("RAE10B45", "SLP179", test));
         assertFalse(MetarParser.parseVisibility("VRB03KT", "10SM", test));
+    }
+
+    @Test
+    public void testLightRain() {
+        MetarParser.parsePresentWeather("-RA", test);
+
+        assertEquals(PresentWeather.RA, test.presentWeather);
+        assertEquals(PresentWeather.Intensity.LIGHT, test.presentWeather.getIntensity());
+    }
+
+    @Test
+    public void testHeavyRain() {
+        MetarParser.parsePresentWeather("+RA", test);
+
+        assertEquals(PresentWeather.RA, test.presentWeather);
+        assertEquals(PresentWeather.Intensity.HEAVY, test.presentWeather.getIntensity());
+    }
+
+    @Test
+    public void testModerateRain() {
+        MetarParser.parsePresentWeather("RA", test);
+
+        assertEquals(PresentWeather.RA, test.presentWeather);
+        assertEquals(PresentWeather.Intensity.MODERATE, test.presentWeather.getIntensity());
+    }
+
+    @Test
+    public void testLightShoweringRain() {
+        MetarParser.parsePresentWeather("-SHRA", test);
+
+        assertEquals(PresentWeather.RA, test.presentWeather);
+        assertEquals(PresentWeather.Intensity.LIGHT, test.presentWeather.getIntensity());
+        assertEquals(PresentWeather.Qualifier.SH, test.presentWeather.getQualifier());
+    }
+
+    @Test
+    public void testHeavyBlowingSnow() {
+        MetarParser.parsePresentWeather("+BLSN", test);
+
+        assertEquals(PresentWeather.SN, test.presentWeather);
+        assertEquals(PresentWeather.Intensity.HEAVY, test.presentWeather.getIntensity());
+        assertEquals(PresentWeather.Qualifier.BL, test.presentWeather.getQualifier());
     }
 }

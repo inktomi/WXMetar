@@ -10,6 +10,7 @@ public class Metar {
     public int zuluTime;
     public Wind winds = new Wind();
     public float visibility;
+    public PresentWeather presentWeather;
     public List<Cloud> clouds = new ArrayList<Cloud>();
     public int temperature;
     public int dewPoint;

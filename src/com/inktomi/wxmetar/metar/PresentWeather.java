@@ -25,25 +25,34 @@ public enum PresentWeather {
     DS("Duststorm");
 
     private String name;
-    private Modifier modifier;
+    private Intensity intensity;
+    private Qualifier qualifier;
 
     PresentWeather(String name) {
         this.name = name;
-    }
-
-    public void setModifier(Modifier modifier) {
-        this.modifier = modifier;
     }
 
     public String getName() {
         return name;
     }
 
-    public Modifier getModifier() {
-        return modifier;
+    public Intensity getIntensity() {
+        return intensity;
     }
 
-    public enum Modifier {
+    public void setIntensity(Intensity intensity) {
+        this.intensity = intensity;
+    }
+
+    public Qualifier getQualifier() {
+        return qualifier;
+    }
+
+    public void setQualifier(Qualifier qualifier) {
+        this.qualifier = qualifier;
+    }
+
+    public enum Intensity {
         LIGHT("-"),
         MODERATE(" "),
         HEAVY("+"),
@@ -51,22 +60,29 @@ public enum PresentWeather {
 
         private String code;
 
-        Modifier(String code) {
+        Intensity(String code) {
             this.code = code;
         }
+    }
 
-        public Modifier getByCode(final String code){
-            if( code.equals("") ){
-                return Modifier.VC;
-            } else if ( code.equals("+") ){
-                return Modifier.HEAVY;
-            } else if ( code.equals(" ") ){
-                return Modifier.MODERATE;
-            } else if ( code.equals("-") ){
-                return Modifier.LIGHT;
-            }
+    public enum Qualifier {
+        MI("Shallow"),
+        PR("Partial"),
+        BC("Patches"),
+        DR("Low Drifting"),
+        BL("Blowing"),
+        SH("Shower(s)"),
+        TS("Thunderstorm"),
+        FZ("Freezing");
 
-            return null;
+        private String name;
+
+        Qualifier(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
         }
     }
 }

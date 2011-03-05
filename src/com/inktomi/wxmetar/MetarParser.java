@@ -1,6 +1,7 @@
 package com.inktomi.wxmetar;
 
 import com.inktomi.wxmetar.metar.Metar;
+import com.inktomi.wxmetar.metar.PresentWeather;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.regex.Matcher;
@@ -79,6 +80,10 @@ public class MetarParser {
                     i = i + 1;
                 }
 
+                continue;
+            }
+
+            if (parsePresentWeather(token, rval)) {
                 continue;
             }
 
@@ -178,6 +183,52 @@ public class MetarParser {
         if (StringUtils.endsWith(token, "SM")) {
             metar.visibility = Float.parseFloat(StringUtils.substring(token, 0, token.length() - 2));
         }
+
+        return rval;
+    }
+
+    static boolean parsePresentWeather(String token, final Metar metar) {
+        boolean rval = Boolean.FALSE;
+
+        String qualifier = null;
+        String weather = token.replace("+", "").replace("-", "");
+        // Strip off the qualifier if the length == 4
+        if (weather.length() == 4) {
+            qualifier = StringUtils.substring(weather, 0, 2);
+            weather = StringUtils.substring(weather, 2, 4);
+        }
+
+        // Strip off any possible modifier, and try to find a match
+        PresentWeather presentWeather = PresentWeather.valueOf(weather);
+
+        if (null != presentWeather) {
+            // Check for a modifier
+            presentWeather.setIntensity(PresentWeather.Intensity.MODERATE);
+
+            if (StringUtils.startsWith(token, "+")) {
+                presentWeather.setIntensity(PresentWeather.Intensity.HEAVY);
+            }
+
+            if (StringUtils.startsWith(token, "-")) {
+                presentWeather.setIntensity(PresentWeather.Intensity.LIGHT);
+            }
+
+            if (null != qualifier) {
+                presentWeather.setQualifier(PresentWeather.Qualifier.valueOf(qualifier));
+            }
+
+            metar.presentWeather = presentWeather;
+
+            rval = Boolean.TRUE;
+        }
+
+        return rval;
+    }
+
+    // CLR
+    // SCT070 SCT085 OVC110
+    static boolean parseCloud(String token, final Metar metar) {
+        boolean rval = Boolean.FALSE;
 
         return rval;
     }
