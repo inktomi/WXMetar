@@ -127,8 +127,9 @@ public class TMetarParser {
     public void testWindGusting() {
         MetarParser.parseWinds("17012G24KT", test);
 
-        assertEquals(24l, (long) test.winds.windGusts);
-        assertEquals(170l, (long) test.winds.windDirection);
+        assertEquals(24l, test.winds.windGusts, 1e-8f);
+        assertEquals(170l, test.winds.windDirection, 1e-8f);
+        assertEquals(12l, test.winds.windSpeed, 1e-8f);
         assertFalse(test.winds.variable);
     }
 

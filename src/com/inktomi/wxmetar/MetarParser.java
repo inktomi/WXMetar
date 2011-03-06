@@ -155,6 +155,7 @@ public class MetarParser {
             int postionOfG = StringUtils.indexOf(token, "G");
             if (postionOfG > -1) {
                 metar.winds.windGusts = Float.parseFloat(StringUtils.substring(token, postionOfG + 1, token.length()));
+                metar.winds.windSpeed = Float.parseFloat(StringUtils.substring(token, 3, postionOfG));
             }
 
             // Is it just a normal wind measurement?
