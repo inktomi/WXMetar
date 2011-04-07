@@ -12,7 +12,7 @@ public class Cloud {
     public int altitude;
 
     public enum Type {
-        SKC("Clear"),
+        SKC("Sky Clear"),
         CLR("Clear"),
         FEW("Few"),
         SCT("Scattered"),
