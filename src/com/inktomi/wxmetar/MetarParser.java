@@ -264,7 +264,7 @@ public class MetarParser {
             c.cloudType = cloudType;
 
             if (!cloudType.equals(Cloud.Type.CLR)) {
-                c.altitude = Integer.parseInt(StringUtils.substring(token, 3, token.length()));
+                c.altitude = Integer.parseInt(StringUtils.substring(token, 3, token.length()))*100;
             }
 
             metar.clouds.add(c);
