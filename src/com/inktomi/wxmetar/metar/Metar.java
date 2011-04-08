@@ -7,7 +7,8 @@ public class Metar {
     public String station;
     public boolean auto;
     public int dayOfMonth;
-    public int zuluTime;
+    public int zuluHour;
+    public int zuluMinute;
     public Wind winds = new Wind();
     public float visibility;
     public PresentWeather presentWeather;
@@ -22,7 +23,8 @@ public class Metar {
                 "station='" + station + '\'' +
                 ", auto=" + auto +
                 ", dayOfMonth=" + dayOfMonth +
-                ", zuluTime=" + zuluTime +
+                ", zuluHour=" + zuluHour +
+                ", zuluMinute=" + zuluMinute +
                 ", winds=" + winds +
                 ", visibility=" + visibility +
                 ", presentWeather=" + presentWeather +

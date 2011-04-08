@@ -49,7 +49,8 @@ public class MetarParser {
         rval.dayOfMonth = Integer.parseInt(StringUtils.substring(tokens[1], 0, 2));
 
         // The time is from 0 to length-1
-        rval.zuluTime = Integer.parseInt(StringUtils.substring(tokens[1], 2, tokens[1].length() - 1));
+        rval.zuluHour = Integer.parseInt(StringUtils.substring(tokens[1], 2, tokens[1].length() - 3));
+        rval.zuluMinute = Integer.parseInt(StringUtils.substring(tokens[1], 4, tokens[1].length() - 1));
 
         // We start our actual parsing at the third element
         for (int i = 2; i < tokens.length; i++) {
@@ -149,7 +150,7 @@ public class MetarParser {
             }
 
             // At this point, we know the first 3 chars are wind direction
-            metar.winds.windDirection = Float.parseFloat(StringUtils.substring(token, 0, 3));
+            metar.winds.windDirection = Integer.parseInt(StringUtils.substring(token, 0, 3));
 
             // Is it gusting? 17012G24
             int postionOfG = StringUtils.indexOf(token, "G");

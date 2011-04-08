@@ -39,7 +39,8 @@ public class TMetarParser {
         assertFalse(test.auto);
 
         assertEquals(5, test.dayOfMonth);
-        assertEquals(156, test.zuluTime);
+        assertEquals(1, test.zuluHour);
+        assertEquals(56, test.zuluMinute);
 
         // Winds
         assertTrue(test.winds.variable);
@@ -51,7 +52,7 @@ public class TMetarParser {
         // Clouds
         assertEquals(1, test.clouds.size());
         assertEquals(Cloud.Type.SCT, test.clouds.get(0).cloudType);
-        assertEquals(250, test.clouds.get(0).altitude);
+        assertEquals(25000, test.clouds.get(0).altitude);
 
         // Temp and dew point
         assertEquals(13, test.temperature);
@@ -69,7 +70,8 @@ public class TMetarParser {
         assertFalse(test.auto);
 
         assertEquals(5, test.dayOfMonth);
-        assertEquals(156, test.zuluTime);
+        assertEquals(1, test.zuluHour);
+        assertEquals(56, test.zuluMinute);
 
         // Winds
         assertTrue(test.winds.variable);
@@ -86,11 +88,11 @@ public class TMetarParser {
         // Clouds
         assertEquals(3, test.clouds.size());
         assertEquals(Cloud.Type.SCT, test.clouds.get(0).cloudType);
-        assertEquals(70, test.clouds.get(0).altitude);
+        assertEquals(7000, test.clouds.get(0).altitude);
         assertEquals(Cloud.Type.SCT, test.clouds.get(1).cloudType);
-        assertEquals(85, test.clouds.get(1).altitude);
+        assertEquals(8500, test.clouds.get(1).altitude);
         assertEquals(Cloud.Type.OVC, test.clouds.get(2).cloudType);
-        assertEquals(110, test.clouds.get(2).altitude);
+        assertEquals(11000, test.clouds.get(2).altitude);
 
         // Temp and dew point
         assertEquals(17, test.temperature);
@@ -128,7 +130,7 @@ public class TMetarParser {
         MetarParser.parseWinds("17012G24KT", test);
 
         assertEquals(24l, test.winds.windGusts, 1e-8f);
-        assertEquals(170l, test.winds.windDirection, 1e-8f);
+        assertEquals(170, test.winds.windDirection);
         assertEquals(12l, test.winds.windSpeed, 1e-8f);
         assertFalse(test.winds.variable);
     }
@@ -138,7 +140,7 @@ public class TMetarParser {
         MetarParser.parseWinds("VRB03KT", test);
 
         assertEquals(-1l, (long) test.winds.windGusts);
-        assertEquals(-1l, (long) test.winds.windDirection);
+        assertEquals(-1, test.winds.windDirection);
         assertTrue(test.winds.variable);
     }
 
@@ -147,7 +149,7 @@ public class TMetarParser {
         MetarParser.parseWinds("26006KT", test);
 
         assertEquals(-1l, (long) test.winds.windGusts);
-        assertEquals(260l, (long) test.winds.windDirection);
+        assertEquals(260, test.winds.windDirection);
         assertEquals(6l, (long) test.winds.windSpeed);
         assertFalse(test.winds.variable);
     }
@@ -228,7 +230,7 @@ public class TMetarParser {
         MetarParser.parseClouds("SCT085", test);
 
         assertEquals(Cloud.Type.SCT, test.clouds.get(0).cloudType);
-        assertEquals(85, test.clouds.get(0).altitude);
+        assertEquals(8500, test.clouds.get(0).altitude);
     }
 
     @Test

@@ -11,5 +11,5 @@ public class Wind {
     public boolean variable;
     public float windSpeed = -1;
     public float windGusts = -1;
-    public float windDirection = -1;
+    public int windDirection = -1;
 }
